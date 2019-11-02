@@ -38,22 +38,12 @@ int sameRoom(struct room*, struct room*);
 void setRoomTypes(struct room*);
 
 int main() {
-  int i;
-  int j;
   struct room gameRooms[ROOMS_IN_GAME];
   srand(time(0));
 
   makeDir();
   initRooms(gameRooms);
   makeFiles(gameRooms);
-  
-
-  for (i = 0; i < ROOMS_IN_GAME; i++) {
-    printf("----------------------\n\nRoom: %s\n", gameRooms[i].name);
-    for (j = 0; j < gameRooms[i].numConnections; j++) {
-      printf("Connection %d: %s\n", j+1, gameRooms[i].connections[j]->name);
-    }
-  }
 
   return 0;
 }
