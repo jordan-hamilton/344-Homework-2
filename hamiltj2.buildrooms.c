@@ -16,8 +16,8 @@
 #include <unistd.h>
 
 struct room {
-  int id;
   char* name;
+  char* type;
   int numConnections;
   struct room* connections[MAX_CONNECTIONS];
 };
@@ -35,6 +35,7 @@ void nameRooms(struct room*);
 void makeFiles(struct room*);
 int roomConnectionsDone(struct room*);
 int sameRoom(struct room*, struct room*);
+void setRoomTypes(struct room*);
 
 int main() {
   struct room gameRooms[ROOMS_IN_GAME];
@@ -68,14 +69,12 @@ void addRoomConnection(struct room* rooms) {
   } while (sameRoom(roomOne, roomTwo) || hasMaxOutboundConnections(roomTwo) || alreadyConnected(roomOne, roomTwo));
 
   connectRooms(roomOne, roomTwo);
-  printf("Room one, %s, is now connected to room two, %s.\n", roomOne->name, roomOne->connections[roomOne->numConnections - 1]->name);
-  printf("Room two, %s, is now connected to room one, %s.\n\n", roomTwo->name, roomTwo->connections[roomTwo->numConnections - 1]->name);
 }
 
 int alreadyConnected(struct room* roomOne, struct room* roomTwo) {
   int i;
   for (i = 0; i < roomOne->numConnections; i++) {
-    if (roomOne->connections[i]->id == roomTwo->id)
+    if (strcmp(roomOne->connections[i]->name, roomTwo->name) == 0)
       return 1;
   }
   return 0;
@@ -86,7 +85,6 @@ void connectRooms(struct room* roomOne, struct room* roomTwo) {
   roomOne->numConnections++;
   roomTwo->connections[roomTwo->numConnections] = roomOne;
   roomTwo->numConnections++;
-  printf("\nConnected %s to %s\n", roomOne->name, roomTwo->name);
 }
 
 int getProcess() {
@@ -115,13 +113,14 @@ int hasMaxOutboundConnections(struct room* room) {
 void initRooms(struct room* rooms) {
   int i;
   for (i = 0; i < ROOMS_IN_GAME; i++) {
-    rooms[i].id = i;
+    rooms[i].name = NULL;
+    rooms[i].type = NULL;
     rooms[i].numConnections = 0;
   }
   nameRooms(rooms);
+  setRoomTypes(rooms);
 
   while(!roomConnectionsDone(rooms)) {
-    printf("Adding a room connection.\n");
     addRoomConnection(rooms);
   }
 }
@@ -138,10 +137,10 @@ void makeDir() {
   free(dirName);
 }
 
-void makeFiles(struct room* gameRooms) {
+void makeFiles(struct room* rooms) {
   int i;
   for (i = 0; i < ROOMS_IN_GAME; i++)
-    printf("Index: %d | Room name: %s\n", gameRooms[i].id, gameRooms[i].name);
+    printf("Room name: %s\n", rooms[i].name);
 }
 
 void nameRooms(struct room* rooms) {
@@ -165,7 +164,6 @@ void nameRooms(struct room* rooms) {
     if (roomNames[roomToAdd] != NULL) {
       rooms[roomsAdded].name = roomNames[roomToAdd];
       roomNames[roomToAdd] = NULL;
-      printf("Added %s to index %d\n", rooms[roomsAdded].name, roomsAdded);
       roomsAdded++;
     }
   }
@@ -181,8 +179,22 @@ int roomConnectionsDone(struct room* rooms) {
 }
 
 int sameRoom(struct room* roomOne, struct room* roomTwo) {
-  if (roomOne->id == roomTwo->id)
+  if (strcmp(roomOne->name, roomTwo->name) == 0)
     return 1;
   else
     return 0;
+}
+
+void setRoomTypes(struct room* rooms) {
+  int i;
+
+  for (i = 0; i < ROOMS_IN_GAME; i++) {
+    if (i == 0) {
+      rooms[i].type = "START_ROOM";
+    } else if (i == ROOMS_IN_GAME - 1) {
+      rooms[i].type = "END_ROOM";
+    } else {
+      rooms[i].type = "MID_ROOM";
+    }
+  }
 }
