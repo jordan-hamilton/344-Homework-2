@@ -38,6 +38,8 @@ int sameRoom(struct room*, struct room*);
 void setRoomTypes(struct room*);
 
 int main() {
+  int i;
+  int j;
   struct room gameRooms[ROOMS_IN_GAME];
   srand(time(0));
 
@@ -45,8 +47,7 @@ int main() {
   initRooms(gameRooms);
   makeFiles(gameRooms);
   
-  int i;
-  int j;
+
   for (i = 0; i < ROOMS_IN_GAME; i++) {
     printf("----------------------\n\nRoom: %s\n", gameRooms[i].name);
     for (j = 0; j < gameRooms[i].numConnections; j++) {
@@ -111,11 +112,14 @@ int hasMaxOutboundConnections(struct room* room) {
 }
 
 void initRooms(struct room* rooms) {
-  int i;
+  int i, j;
   for (i = 0; i < ROOMS_IN_GAME; i++) {
     rooms[i].name = NULL;
     rooms[i].type = NULL;
     rooms[i].numConnections = 0;
+    for (j = 0; j < MAX_CONNECTIONS; j++) {
+      rooms[i].connections[j] = NULL;
+    }
   }
   nameRooms(rooms);
   setRoomTypes(rooms);
@@ -126,11 +130,11 @@ void initRooms(struct room* rooms) {
 }
 
 void makeDir() {
-  char* dirName = malloc(21 * sizeof(char));
-  if (dirName == NULL)
+  char* dirName = malloc(36 * sizeof(char));
+  if (!dirName)
     printf("An error occurred.\n");
 
-  memset(dirName, '\0', 21);
+  memset(dirName, '\0', 36);
   sprintf(dirName, "hamiltj2.rooms.%d", getProcess());
   mkdir(dirName, S_IRWXU);
 
@@ -138,9 +142,22 @@ void makeDir() {
 }
 
 void makeFiles(struct room* rooms) {
-  int i;
-  for (i = 0; i < ROOMS_IN_GAME; i++)
-    printf("Room name: %s\n", rooms[i].name);
+  FILE* roomFile;
+
+  char* fileName = malloc(52 * sizeof(char));
+  if (!fileName)
+    printf("An error occurred.\n");
+
+  memset(fileName, '\0', 52);
+  sprintf(fileName, "./hamiltj2.rooms.%d/room.txt", getProcess());
+
+  roomFile = fopen(fileName, "a");
+  if (!roomFile)
+    printf("An error occurred.\n");
+
+  fprintf(roomFile, "Room: %s\n", rooms[0].name);
+  fclose(roomFile);
+  free(fileName);
 }
 
 void nameRooms(struct room* rooms) {
@@ -161,7 +178,7 @@ void nameRooms(struct room* rooms) {
   while (roomsAdded < ROOMS_IN_GAME) {
     int roomToAdd = getRandomInt(0, TOTAL_ROOMS - 1);
 
-    if (roomNames[roomToAdd] != NULL) {
+    if (roomNames[roomToAdd]) {
       rooms[roomsAdded].name = roomNames[roomToAdd];
       roomNames[roomToAdd] = NULL;
       roomsAdded++;
