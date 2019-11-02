@@ -142,21 +142,33 @@ void makeDir() {
 }
 
 void makeFiles(struct room* rooms) {
-  FILE* roomFile;
+  int i, j;
+  FILE *roomFile;
 
-  char* fileName = malloc(52 * sizeof(char));
+  char *fileName = malloc(52 * sizeof(char));
   if (!fileName)
     printf("An error occurred.\n");
 
   memset(fileName, '\0', 52);
-  sprintf(fileName, "./hamiltj2.rooms.%d/room.txt", getProcess());
 
-  roomFile = fopen(fileName, "a");
-  if (!roomFile)
-    printf("An error occurred.\n");
+  for (i = 0; i < ROOMS_IN_GAME; i++) {
+    sprintf(fileName, "./hamiltj2.rooms.%d/%s_room", getProcess(), rooms[i].name);
+    roomFile = fopen(fileName, "a");
 
-  fprintf(roomFile, "Room: %s\n", rooms[0].name);
-  fclose(roomFile);
+    if (!roomFile)
+      printf("An error occurred.\n");
+
+    fprintf(roomFile, "ROOM NAME: %s\n", rooms[i].name);
+
+    for (j = 0; j < rooms[i].numConnections; j++) {
+      fprintf(roomFile, "CONNECTION %d: %s\n", j + 1, rooms[i].connections[j]->name);
+    }
+
+    fprintf(roomFile, "ROOM TYPE: %s\n", rooms[i].type);
+
+    fclose(roomFile);
+  }
+
   free(fileName);
 }
 
