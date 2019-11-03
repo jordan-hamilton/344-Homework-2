@@ -1,12 +1,7 @@
-/*
-// Created by Jordan Hamilton on 10/27/19.
-*/
-
 #define MIN_CONNECTIONS 3
 #define MAX_CONNECTIONS 6
 #define ROOMS_IN_GAME 7
 #define TOTAL_ROOMS 10
-
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,7 +44,7 @@ int main() {
 }
 
 void addRoomConnection(struct room* rooms) {
-  /* Credit: Block 2.2: Program Outlining in Program 2 */
+  /* Credit: Block 2.2 - Program Outlining in Program 2 */
 
   struct room *roomOne, *roomTwo;
 
@@ -133,7 +128,7 @@ void initRooms(struct room* rooms) {
   nameRooms(rooms);
   setRoomTypes(rooms);
 
-  while(!roomConnectionsDone(rooms)) {
+  while (!roomConnectionsDone(rooms)) {
     addRoomConnection(rooms);
   }
 }
@@ -158,9 +153,9 @@ void makeFiles(struct room* rooms) {
    * then loops through all rooms for the adventure game and opens a file for each room to add the
    * data associated with that room in the format matching the program specifications. */
   int i, j;
-  FILE *roomFile;
+  FILE* roomFile;
 
-  char *fileName = malloc(52 * sizeof(char));
+  char* fileName = malloc(52 * sizeof(char));
   if (!fileName)
     printf("An error occurred.\n");
 
